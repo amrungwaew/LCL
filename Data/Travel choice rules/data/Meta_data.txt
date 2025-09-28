@@ -1,0 +1,51 @@
+Meta data for VoT_21-Jun-2016_11-20_full_data.dat
+
+Unlabeled Route choice experiment with 3 alternatives and 2 attributes.
+
+OBS		Observation number
+ID		Respondent ID
+CS		Choice set number
+CSRUM	Indicates whether the choice set belong to the efficient experimental design for RUM (1 == yes, 0 == no)
+CSPRRM	Indicates whether the choice set belong to the efficient experimental design for RRM (1 == yes, 0 == no)
+TT1		Travel Time of Alternative 1
+TC1		Travel Cost of Alternative 1
+TT2		Travel Time of Alternative 2
+TC2		Travel Cost of Alternative 2
+TT3		Travel Time of Alternative 3
+TC3		Travel Cost of Alternative 3
+Choice	Choice across alternatives 1,2,3
+Sex		1 == Male, 2 == Female, 88888 == Missing value
+Age		Years, 88888 == Missing value
+Edu		Education level. 2 == No education, 3 == Elementary school, 4 == Lower education, 5 == Middle education, 6 == Higher education, 7 == University education, 88888 = Missing value
+IncHH	HouseHold Income. 
+			1 == Less than € 4.700
+			2 == 4.700 to € 6.500
+			3 == € 6.500 to € 8.200
+			4 == € 8.200 to € 9.400
+			5 == € 9.400 to € 11.200
+			6 == € 11.200 to € 12.900
+			7 == € 12.900 to € 14.700
+			8 == € 14.700 to € 15.900
+			9 == € 15.900 to € 17.600
+			10 == €  17.600 to € 20.600
+			11 == € 20.600 to € 24.100
+			12 == € 24.100 to € 27.000
+			13 == € 27.000 to € 33.500
+			14 == € 33.500 to € 40.000
+			15 == € 40.000 to € 52.900
+			16 == € 52.900 to € 67.000
+			17 == € 67.000 to € 79.900
+			18 == € 79.900 tot € 107.000
+			19 == € 107.000 to € 133.400
+			20 == € 133.400 to € 159.900
+			21 == € 159.900 to € 186.900
+			22 == € 186.900 to € 212.800
+			23 == € 212.800 to € 239.800
+			24 == € 239.800 to € 266.800
+			25 == € 266.800 to € 293.300
+			26 == € 293.300 to € 320.300
+			27 == € 320.300 of meer
+			28 == I do not know
+			29 == I don't want to tell
+Urb			Urbanisation level. 1 == Low ... 5 == High 
+SClass		Social class (according to Dutch classification system). 1 ==	A (high), 2 == B1, 3 == B2, 4 == C, 5 == D (Low)
