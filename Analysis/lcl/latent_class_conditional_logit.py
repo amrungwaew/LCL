@@ -135,9 +135,6 @@ class LatentClassConditionalLogit(ChoiceModel):
         self.num_dem_vars = len(dem_varnames) if dem_varnames is not None else 0
         num_panels = jnp.unique(panels).shape[0]
 
-        print(f"dem_varnames : {dem_varnames}")
-        print(f"dems.shape : {dems.shape}")
-
         y, Xnames, ids, panels, dems, num_ids = self._setup_input_data(
             y, ids, panels, dems, predict_mode=False
         )
@@ -167,6 +164,8 @@ class LatentClassConditionalLogit(ChoiceModel):
                 ),
                 static_argnames=["return_gradient"],
             )
+        else:
+            _class_membership_probs_fn, _grouped_data_loglik_fn = None, None
 
         # Obtain starting class shares and coefficients
         self.betas, self.thetas, self.shares = self._get_starting_vals(
@@ -607,23 +606,28 @@ class LatentClassConditionalLogit(ChoiceModel):
         print(jnp.cov(self.betas, aweights=self.shares, ddof=0))
 
         # Compute covariance between demographics and tastes
-        dems_minus_mean = dems - dems.mean(axis=0)[None, :]  # (Np, D) - (D,) -> (Np, D)
-        weighted_dems_minus_mean = jnp.einsum(
-            "nc,nd->cd", class_probs_by_panel, dems_minus_mean
-        )  # (Np, C) * (Np, D) -> (C, D)
+        if dems is not None:
+            dems_minus_mean = (
+                dems - dems.mean(axis=0)[None, :]
+            )  # (Np, D) - (D,) -> (Np, D)
+            weighted_dems_minus_mean = jnp.einsum(
+                "nc,nd->cd", class_probs_by_panel, dems_minus_mean
+            )  # (Np, C) * (Np, D) -> (C, D)
 
-        betas_minus_mean = self.betas - mean_betas[:, None]  # (K, C) - (K,) -> (K, C)
+            betas_minus_mean = (
+                self.betas - mean_betas[:, None]
+            )  # (K, C) - (K,) -> (K, C)
 
-        dem_taste_cov = (
-            jnp.einsum("cd,kc->dk", weighted_dems_minus_mean, betas_minus_mean)
-            / sample_size
-        )  # (C, D) * (K, C) ->  (D, K)
+            dem_taste_cov = (
+                jnp.einsum("cd,kc->dk", weighted_dems_minus_mean, betas_minus_mean)
+                / sample_size
+            )  # (C, D) * (K, C) ->  (D, K)
 
-        print("====\nDEMOGRAPHIC COVARIANCES\n")
-        for dem_idx, dem_nm in enumerate(dem_varnames):
-            print(f"** Demographic variable: {dem_nm} **")
-            for coeff_idx, coeff_nm in enumerate(coeff_names):
-                print(f"{coeff_nm} : {dem_taste_cov[dem_idx, coeff_idx]:.3}")
+            print("====\nDEMOGRAPHIC COVARIANCES\n")
+            for dem_idx, dem_nm in enumerate(dem_varnames):
+                print(f"** Demographic variable: {dem_nm} **")
+                for coeff_idx, coeff_nm in enumerate(coeff_names):
+                    print(f"{coeff_nm} : {dem_taste_cov[dem_idx, coeff_idx]:.3}")
 
         print(
             "\n".join(
