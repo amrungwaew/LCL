@@ -1,0 +1,208 @@
+\documentclass[12pt]{article}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[amsthm]{newtx}
+\usepackage{bbm, bm}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{mathtools}
+
+% Typsetting proofs
+\theoremstyle{plain} 
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\renewcommand{\qedsymbol}{\(\blacksquare\)}
+
+% Neat tables
+\usepackage[labelsep=endash,font=sc,justification=centering]{caption}
+\usepackage[labelsep=period,font=it,labelformat=simple]{subcaption}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{dcolumn}
+\usepackage{siunitx}
+\sisetup{
+  detect-all,
+  group-digits             = true,
+  group-minimum-digits     = 5,
+  group-separator          = {,},
+  table-align-text-pre     = false,
+  table-align-text-post    = false,
+  input-signs              = + -,
+  %input-symbols            = {*} {**} {***},
+  input-open-uncertainty   = ,
+  input-close-uncertainty  = ,
+  retain-explicit-plus
+}
+\usepackage[flushleft]{threeparttable}
+\usepackage{xpatch}
+
+\usepackage[hidelinks, pdfstartview=]{hyperref}
+\usepackage[noabbrev,capitalise]{cleveref}
+\crefname{equation}{equation}{equations}
+% \crefname{table}{Table}{Tables}
+\crefname{appfig}{Appendix Figure}{Appendix Figures}
+\crefname{apptab}{Appendix Table}{Appendix Tables}
+% \crefname{equation}{}{}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[bottom]{footmisc}
+\usepackage{abstract}
+
+\makeatletter
+\chardef\TPT@@@asteriskcatcode=\catcode`*
+\catcode`*=11
+\xpatchcmd{\threeparttable}
+{\TPT@hookin{tabular}}
+{\TPT@hookin{tabular}\TPT@hookin{tabu}}
+{}{}
+\catcode`*=\TPT@@@asteriskcatcode
+\makeatother
+\makeatletter
+\renewcommand\@biblabel[1]{}
+\makeatother
+\parskip 0cm
+\parindent .5cm
+\textwidth=6.67in
+\oddsidemargin .0in
+\topmargin -.5in
+\textheight 9in
+
+% Format section headings
+% ======================
+\usepackage{sectsty}
+\subsectionfont{\large\normalfont\itshape}
+\subsubsectionfont{\normalsize\normalfont\itshape}
+
+\makeatletter
+\renewcommand\thesubsection{\Alph{subsection}}
+\renewcommand{\@seccntformat}[1]{\csname the#1\endcsname.\quad}
+\renewcommand{\p@subsection}{\thesection} % for cross-refs to subsections
+\makeatother
+% =======================
+
+% Format exhibit captions
+% =======================
+\renewcommand{\thefigure}{\textmd{\arabic{figure}}}
+\renewcommand{\thetable}{\textmd{\arabic{table}}}
+
+\renewcommand{\figurename}{{ \sc Figure}}
+\renewcommand{\thesubfigure}{Panel \textmd{\Alph{subfigure}}}
+\renewcommand{\tablename}{{ \sc Table}}
+\renewcommand{\thesubtable}{Panel \Alph{subtable}}
+% =======================
+
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\newcommand\mc[1]{\multicolumn{1}{c}{#1}}% <---
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\DeclareMathOperator{\wideargmin}{arg\,min}
+\DeclareMathOperator{\wideargmax}{arg\,max}
+
+\DeclareMathOperator{\widemin}{min}
+\DeclareMathOperator{\widemax}{max}
+
+\usepackage{float}
+
+\renewcommand{\topfraction}{.85}
+\renewcommand{\bottomfraction}{.7}
+\renewcommand{\textfraction}{.15}
+\renewcommand{\floatpagefraction}{.66}
+\renewcommand{\dbltopfraction}{.66}
+\renewcommand{\dblfloatpagefraction}{.66}
+\setcounter{topnumber}{9}
+\setcounter{bottomnumber}{9}
+\setcounter{totalnumber}{20}
+\setcounter{dbltopnumber}{9}
+
+\raggedbottom
+\singlespacing
+
+\begin{document}
+
+\title{Gradient of Within/Across Model}
+\author{Andrew~Zeyveld}
+\date{\today}
+\maketitle
+\onehalfspacing
+
+
+\section{Likelihood}
+
+To streamline notation, let the vector \(\bm{\vartheta} \coloneq ( \bar{\bm{\beta}}_i, \omega_{it}^d, \alpha_i) \) collect the taste and learning parameters associated with consumer \(i\). Likewise, the vector \(w_{jt} \coloneq (x_j, p_{jt}, \xi_{jt})\) collect the observable characteristics, price, and unobserved demand shock associated with good \(j\). Finally, denote the representative utility of good \(j\), namely \(u_{ijt} - \varepsilon_{ijt}\), by 
+\begin{equation*}
+  V(w_{jt}; \bm{\vartheta}_{it}) = x_j \bm{\beta}_{it} - \alpha_i p_{jt} + \xi_{jt}.
+\end{equation*}
+
+Then, by the (conditional) logit formula, the probability of good \(j\)'s being ordered by consumer \(i\) at time \(t\) is 
+\begin{equation*}
+  \operatorname{Pr} [ \text{order}_{ijt} = 1 \mid  \bm{\vartheta}_{it} ] \coloneq \frac{\exp \big(  V(w_{jt}; \bm{\vartheta}_{it}) \big)}{\sum_{j' \in \mathcal{J}_t} \big(  V(w_{j't}; \bm{\vartheta}_{it}) \big)}.
+\end{equation*}
+
+If the consumer's preferred good goes out of stock, the probability of her accepting good \(s\) as a substitute is 
+\begin{equation*}
+  \operatorname{Pr} [ \text{accept}_{ist} = 1 \mid \bm{\vartheta}_{it} ] \coloneq \frac{\exp \big(  V(w_{st}; \bm{\vartheta}_{it}) \big)}{1 + \exp \big(  V(w_{st}; \bm{\vartheta}_{it}) \big)}.
+\end{equation*}
+
+
+\section{Gradient}
+
+I will now derive the gradient of the likelihood function. In deriving the gradient (as well as in estimation), it is more convenient to analyze the log-likelihood function than the likelihood function itself. Taking the natural logarithm of [equation] yields 
+\begin{equation}
+  SLL(\bm{\vartheta}) = \sum_{i=1}^N \log \Bigg( \frac{1}{R} \sum_{r=1}^R \prod_{t \in \mathcal{T}_i} \prod_{j \in \mathcal{J}_t}  \frac{1}{D} \sum_{d=1}^D \bigg( \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \bigg)  \Bigg), \label{eq:sim-loglik}
+\end{equation}
+where
+\begin{equation*}
+   \varphi^{\text{order}}_{ijt, \, rd} \coloneq \operatorname{Pr} [ \text{order}_{ijt} = 1 \mid \bm{\vartheta}_{it}^{rd} ]^{\text{order}_{ijt}}
+\end{equation*}
+and 
+\begin{equation*}
+   \varphi^{\text{accept}}_{ist, \, rd} \coloneq \operatorname{Pr} [\text{accept}_{ist} = 1 \mid \bm{\vartheta}_{it}^{rd}  ]^{\text{OOS}_{jt} \cdot \text{accept}_{ist}}.
+\end{equation*}
+
+Differentiating \cref{eq:sim-loglik} with respect to \(\bm{\vartheta}\), we obtain 
+\begin{equation}
+  \frac{\partial SLL(\bm{\vartheta})}{\partial \bm{\vartheta}} = \sum_{i=1}^N \frac{\frac{1}{R} \sum_{r=1}^R \frac{\partial}{\partial \bm{\vartheta}} \prod_{t=1}^T \Big( \frac{1}{R} \sum_{r=1}^R \big( \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \big) \Big)}{\frac{1}{R} \sum_{r=1}^R \prod_{t=1}^T \Big( \frac{1}{R} \sum_{r=1}^R \big( \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \big) \Big)} \label{eq:grad-init}
+\end{equation}
+
+Consider the derivative in the numerator of \cref{eq:grad-init}. Repeated application of the product rule yields
+\begin{flalign}
+  \frac{\partial}{\partial \bm{\vartheta}} \prod_{t=1}^T \Big( \frac{1}{R} \sum_{r=1}^R \big( \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \big) \Big) &= \bigg( \prod_{t=1}^T \Big( \frac{1}{R} \sum_{r=1}^R \big( \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \big) \Big) \bigg) \nonumber \\ 
+  &\qquad \cdot \bigg( \sum_{t=1}^T \frac{\frac{1}{R} \sum_{r=1}^R \frac{\partial}{\partial \bm{\vartheta}} \big( \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \big)}{\frac{1}{R} \sum_{r=1}^R \big( \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \big)} \bigg) \nonumber \\
+  &= \bigg( \prod_{t=1}^T \Big( \frac{1}{R} \sum_{r=1}^R \big( \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \big) \Big) \bigg) \nonumber \\ 
+  &\qquad \cdot \Bigg( \sum_{t=1}^T \sum_{r=1}^R \bigg( \frac{\partial  \varphi^{\text{order}}_{ijt, \, rd} }{\partial \bm{\vartheta}} \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \nonumber \\ 
+  &\qquad \qquad \qquad \qquad \quad + \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \frac{\partial }{\partial \bm{\vartheta}} \Big(\prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \Big) \bigg) \Bigg) \nonumber \\
+  &\qquad \big/  \sum_{r=1}^R \Big( \varphi^{\text{order}}_{ijt, \, rd} 
+  \cdot  \prod_{s \in \mathcal{J}_t \setminus \{j\} }\varphi^{\text{accept}}_{ist, \, rd} \Big)
+\end{flalign}
+By Eqs. 28 and 29 of [Krueger year],
+\begin{equation*}
+  \frac{\partial \varphi^{\text{order}}_{ijt, \, rd}}{\partial \bm{\vartheta}} = \varphi^{\text{order}}_{ijt, \, rd} \cdot \frac{\partial V(w_{jt}; \bm{\vartheta}_{it})}{\partial \bm{\vartheta}_{it}}  - \sum_{j' \in \mathcal{J}_t \setminus \{j\}}  \varphi^{\text{order}}_{ijt, \, rd} \cdot \varphi^{\text{order}}_{ijt, \, rd} \cdot \frac{\partial V(w_{j't}; \bm{\vartheta}_{it})}{\partial \bm{\vartheta}_{it}}, 
+\end{equation*}
+where \ldots 
+
+Likewise,
+\begin{equation*}
+  \frac{\partial \varphi^{\text{accept}}_{ist, \, rd} }{\partial \bm{\vartheta}} = \varphi^{\text{accept}}_{ist, \, rd}  \cdot \frac{\partial V(w_{jt}; \bm{\vartheta}_{it})}{\partial \bm{\vartheta}_{it}}  - \varphi^{\text{accept}}_{ist, \, rd} \cdot \varphi^{\text{reject}}_{ist, \, rd} \cdot \frac{\partial V(w_{0t}; \bm{\vartheta}_{it})}{\partial \bm{\vartheta}_{it}}, 
+\end{equation*}
+where 
+\begin{equation*}
+  \varphi^{\text{reject}}_{ist, \, rd} \coloneq \frac{1}{1 + \exp \big(  V(w_{st}; \bm{\vartheta}_{it}) \big)}.
+\end{equation*}
+
+\end{document}
